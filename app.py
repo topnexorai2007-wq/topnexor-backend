@@ -51,7 +51,7 @@ login_history = db["login_history"]
 # =========================
 
 gemini_client = genai.Client(
-    api_key="AQ.Ab8RN6JNH5PldH7YlyuDwKpD-BHvYE83k_OA2QT_8y7zKpdgPg"
+    api_key=""
 )
 
 PRIMARY_MODEL = "models/gemini-2.5-flash"
@@ -61,7 +61,7 @@ FALLBACK_MODEL = "models/gemini-2.5-flash-lite"
 # HUGGINGFACE
 # =========================
 
-HF_API_KEY = "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"
+HF_API_KEY = ""
 
 HF_MODEL = "mistralai/Mistral-Medium-3.5-128B"
 
