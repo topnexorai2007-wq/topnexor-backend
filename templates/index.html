@@ -1,0 +1,589 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Topnexor AI</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#0f172a;
+color:white;
+height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+.header{
+height:60px;
+background:#111827;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 15px;
+position:relative;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#38bdf8;
+}
+
+.menu-btn{
+font-size:28px;
+cursor:pointer;
+}
+
+.dropdown{
+position:absolute;
+top:60px;
+right:10px;
+background:#1e293b;
+width:250px;
+border-radius:10px;
+display:none;
+overflow:hidden;
+z-index:100;
+box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+.dropdown div{
+padding:14px;
+border-bottom:1px solid rgba(255,255,255,0.1);
+cursor:pointer;
+}
+
+.dropdown div:hover{
+background:#334155;
+}
+
+.chat-box{
+flex:1;
+padding:15px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+}
+
+.msg{
+max-width:75%;
+padding:12px;
+margin:8px 0;
+border-radius:10px;
+word-wrap:break-word;
+}
+
+.user{
+background:#38bdf8;
+align-self:flex-end;
+color:black;
+}
+
+.bot{
+background:#1e293b;
+align-self:flex-start;
+}
+
+.input-area{
+display:flex;
+padding:10px;
+background:#111827;
+align-items:center;
+}
+
+.input-area input{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+outline:none;
+background:#1e293b;
+color:white;
+}
+
+.input-area button{
+width:80px;
+margin-left:10px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+padding:10px;
+}
+
+.icon-btn{
+width:50px !important;
+font-size:20px;
+}
+
+.light-mode{
+background:white;
+color:black;
+}
+
+.light-mode .header{
+background:#e5e7eb;
+}
+
+.light-mode .dropdown{
+background:white;
+color:black;
+}
+
+.light-mode .dropdown div:hover{
+background:#ddd;
+}
+
+.light-mode .input-area{
+background:#e5e7eb;
+}
+
+.light-mode .input-area input{
+background:white;
+color:black;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="logo">
+Topnexor AI
+</div>
+
+<div class="menu-btn" onclick="toggleMenu()">
+⋮
+</div>
+
+<div class="dropdown" id="dropdown">
+
+<div onclick="profile()">
+👤 Profile
+</div>
+
+<div onclick="chatHistory()">
+🕘 Chat History
+</div>
+
+<div onclick="savedChats()">
+💾 Saved Chats
+</div>
+
+<div onclick="toggleMode()">
+🌙 Dark / Light Mode
+</div>
+
+<div onclick="changePassword()">
+🔒 Change Password
+</div>
+
+<div onclick="youtubeSearch()">
+▶ YouTube Search
+</div>
+
+<div onclick="clearChat()">
+🗑 Clear Chat
+</div>
+
+<div onclick="logout()">
+🚪 Logout
+</div>
+
+</div>
+
+</div>
+
+<div class="chat-box" id="chatBox">
+
+<div class="msg bot">
+Hello 👋 Welcome to Topnexor AI
+</div>
+
+</div>
+
+<div class="input-area">
+
+<button class="icon-btn" onclick="startVoice()">
+🎤
+</button>
+
+<input
+type="text"
+id="message"
+placeholder="Type message..."
+>
+
+<input
+type="file"
+id="imageInput"
+style="display:none"
+accept="image/*"
+onchange="uploadImage()"
+>
+
+<button class="icon-btn"
+onclick="document.getElementById('imageInput').click()">
+📷
+</button>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+<script>
+
+/* LOGIN CHECK */
+
+if(!localStorage.getItem("name")){
+
+window.location.href="/";
+
+}
+
+/* MENU */
+
+function toggleMenu(){
+
+let menu =
+document.getElementById("dropdown");
+
+if(menu.style.display=="block"){
+
+menu.style.display="none";
+
+}else{
+
+menu.style.display="block";
+
+}
+
+}
+
+/* SEND MESSAGE */
+
+async function sendMessage(){
+
+let input =
+document.getElementById("message");
+
+let text = input.value;
+
+if(text=="") return;
+
+/* USER MESSAGE */
+
+let userDiv =
+document.createElement("div");
+
+userDiv.className="msg user";
+
+userDiv.innerText=text;
+
+document.getElementById("chatBox")
+.appendChild(userDiv);
+
+input.value="";
+
+/* SAVE HISTORY */
+
+let history =
+JSON.parse(localStorage.getItem("history")) || [];
+
+history.push({
+user:text
+});
+
+localStorage.setItem(
+"history",
+JSON.stringify(history)
+);
+
+/* TYPING */
+
+let typing =
+document.createElement("div");
+
+typing.className="msg bot";
+
+typing.innerText="Typing...";
+
+document.getElementById("chatBox")
+.appendChild(typing);
+
+try{
+
+let response = await fetch(
+"/chat",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+message:text,
+
+username:
+localStorage.getItem("name")
+
+})
+
+}
+);
+
+let result =
+await response.json();
+
+typing.remove();
+
+/* BOT MESSAGE */
+
+let botDiv =
+document.createElement("div");
+
+botDiv.className="msg bot";
+
+botDiv.innerText=result.reply;
+
+document.getElementById("chatBox")
+.appendChild(botDiv);
+
+/* SAVE BOT HISTORY */
+
+history.push({
+bot:result.reply
+});
+
+localStorage.setItem(
+"history",
+JSON.stringify(history)
+);
+
+}catch{
+
+typing.remove();
+
+let errorDiv =
+document.createElement("div");
+
+errorDiv.className="msg bot";
+
+errorDiv.innerText="⚠ Server Error";
+
+document.getElementById("chatBox")
+.appendChild(errorDiv);
+
+}
+
+}
+
+/* PROFILE */
+
+function profile(){
+
+alert(
+
+"👤 PROFILE\n\n" +
+
+"Name: " +
+localStorage.getItem("name") +
+
+"\n\nPhone: " +
+localStorage.getItem("phone") +
+
+"\n\nLanguage: " +
+localStorage.getItem("language")
+
+);
+
+}
+
+/* CHAT HISTORY */
+
+function chatHistory(){
+
+let history =
+JSON.parse(localStorage.getItem("history")) || [];
+
+if(history.length==0){
+
+alert("No Chat History");
+
+return;
+
+}
+
+let text="";
+
+history.forEach(item=>{
+
+if(item.user){
+
+text += "You: " + item.user + "\n";
+
+}
+
+if(item.bot){
+
+text += "AI: " + item.bot + "\n\n";
+
+}
+
+});
+
+alert(text);
+
+}
+
+/* SAVE CHATS */
+
+function savedChats(){
+
+let history =
+localStorage.getItem("history");
+
+localStorage.setItem(
+"savedChats",
+history
+);
+
+alert("Chats Saved");
+
+}
+
+/* DARK MODE */
+
+function toggleMode(){
+
+document.body.classList.toggle(
+"light-mode"
+);
+
+}
+
+/* CHANGE PASSWORD */
+
+function changePassword(){
+
+let newPass =
+prompt("Enter New Password");
+
+if(newPass){
+
+localStorage.setItem(
+"password",
+newPass
+);
+
+alert("Password Changed");
+
+}
+
+}
+
+/* YOUTUBE SEARCH */
+
+function youtubeSearch(){
+
+let search =
+prompt("Search on YouTube");
+
+if(search){
+
+window.open(
+
+"https://www.youtube.com/results?search_query=" + search,
+
+"_blank"
+
+);
+
+}
+
+}
+
+/* VOICE INPUT */
+
+function startVoice(){
+
+let recognition =
+new webkitSpeechRecognition();
+
+recognition.lang = "en-IN";
+
+recognition.start();
+
+recognition.onresult = function(event){
+
+document.getElementById("message").value =
+event.results[0][0].transcript;
+
+};
+
+}
+
+/* IMAGE UPLOAD */
+
+function uploadImage(){
+
+let file =
+document.getElementById("imageInput").files[0];
+
+if(file){
+
+alert("Image Selected: " + file.name);
+
+}
+
+}
+
+/* CLEAR CHAT */
+
+function clearChat(){
+
+document.getElementById(
+"chatBox"
+).innerHTML="";
+
+localStorage.removeItem("history");
+
+}
+
+/* LOGOUT */
+
+function logout(){
+
+localStorage.clear();
+
+window.location.href="/";
+
+}
+
+</script>
+
+</body>
+</html>

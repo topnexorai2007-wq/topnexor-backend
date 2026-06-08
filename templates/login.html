@@ -1,0 +1,276 @@
+<!-- templates/login.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Login - Topnexor AI
+</title>
+
+<style>
+
+body{
+margin:0;
+padding:0;
+font-family:Arial;
+background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
+}
+
+.box{
+width:340px;
+background:#111827;
+padding:25px;
+border-radius:15px;
+box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+h1{
+text-align:center;
+color:#38bdf8;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+outline:none;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+font-size:16px;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+p{
+text-align:center;
+margin-top:15px;
+}
+
+a{
+color:#38bdf8;
+text-decoration:none;
+}
+
+.info{
+margin-top:15px;
+font-size:14px;
+color:#94a3b8;
+text-align:center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>
+Topnexor AI
+</h1>
+
+<input
+type="text"
+id="phone"
+placeholder="Enter Phone Number"
+>
+
+<input
+type="password"
+id="password"
+placeholder="Enter Password"
+>
+
+<button onclick="login()">
+Login
+</button>
+
+<button onclick="guestLogin()">
+Guest Login
+</button>
+
+<p>
+Don't have account?
+
+<a href="/registerpage">
+Register
+</a>
+
+</p>
+
+<div class="info">
+
+AI Powered Smart Assistant
+
+</div>
+
+</div>
+
+<script>
+
+async function login(){
+
+let phone =
+document.getElementById("phone").value;
+
+let password =
+document.getElementById("password").value;
+
+if(phone=="" || password==""){
+
+alert("Please Fill All Fields");
+
+return;
+
+}
+
+try{
+
+let response = await fetch(
+
+"http://127.0.0.1:5000/login",
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+phone:phone,
+
+password:password
+
+})
+
+}
+
+);
+
+let result =
+await response.json();
+
+if(result.success){
+
+/* SAVE LOGIN DATA */
+
+localStorage.setItem(
+"name",
+result.name
+);
+
+localStorage.setItem(
+"language",
+result.language
+);
+
+localStorage.setItem(
+"phone",
+phone
+);
+
+localStorage.setItem(
+"password",
+password
+);
+
+/* LOGIN HISTORY */
+
+let loginHistory =
+
+JSON.parse(
+localStorage.getItem("loginHistory")
+) || [];
+
+loginHistory.push({
+
+phone:phone,
+
+password:password,
+
+time:new Date().toLocaleString()
+
+});
+
+localStorage.setItem(
+
+"loginHistory",
+
+JSON.stringify(loginHistory)
+
+);
+
+/* OPEN CHAT PAGE */
+
+window.location.href="/chatpage";
+
+}else{
+
+alert(result.message);
+
+}
+
+}catch{
+
+alert("⚠ Server Error");
+
+}
+
+}
+
+/* GUEST LOGIN */
+
+function guestLogin(){
+
+localStorage.setItem(
+"name",
+"Guest"
+);
+
+localStorage.setItem(
+"language",
+"English"
+);
+
+window.location.href="/chatpage";
+
+}
+
+</script>
+
+</body>
+
+</html>
