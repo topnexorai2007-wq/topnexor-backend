@@ -51,8 +51,11 @@ login_history = db["login_history"]
 # =========================
 
 gemini_client = genai.Client(
-    api_key=""
+    api_key=os.getenv("GEMINI_API_KEY")
 )
+
+PRIMARY_MODEL = "models/gemini-2.5-flash"
+FALLBACK_MODEL = "models/gemini-2.5-flash-lite")
 
 PRIMARY_MODEL = "models/gemini-2.5-flash"
 FALLBACK_MODEL = "models/gemini-2.5-flash-lite"
@@ -61,8 +64,8 @@ FALLBACK_MODEL = "models/gemini-2.5-flash-lite"
 # HUGGINGFACE
 # =========================
 
-HF_API_KEY = ""
-
+HF_API_KEY = os.getenv("HF_API_KEY")
+HF_MODEL = "mistralai/Mistral-Medium-3.5-128B"
 HF_MODEL = "mistralai/Mistral-Medium-3.5-128B"
 
 def call_huggingface(prompt):
