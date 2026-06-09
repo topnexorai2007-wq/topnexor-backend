@@ -34,6 +34,7 @@ protobuf>=4.25.0,<8.0.0
 
 # Web framework & server
 flask==3.0.3
+flask-cors==4.0.0
 gunicorn==22.0.0
 
 # HTTP requests
