@@ -29,12 +29,13 @@ typing-inspection==0.4.2
 httplib2==0.31.2
 uritemplate==4.2.0
 
-# Protobuf (fixed range to avoid conflicts)
+# Protobuf
 protobuf>=4.25.0,<8.0.0
 
 # Web framework & server
 flask==3.0.3
 flask-cors==4.0.0
+flask-bcrypt==1.0.1
 gunicorn==22.0.0
 
 # HTTP requests
