@@ -55,7 +55,7 @@ gemini_client = genai.Client(
 )
 
 PRIMARY_MODEL = "models/gemini-2.5-flash"
-FALLBACK_MODEL = "models/gemini-2.5-flash-lite")
+FALLBACK_MODEL = "models/gemini-2.5-flash-lite"
 
 PRIMARY_MODEL = "models/gemini-2.5-flash"
 FALLBACK_MODEL = "models/gemini-2.5-flash-lite"
