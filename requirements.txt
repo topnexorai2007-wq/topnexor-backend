@@ -39,3 +39,6 @@ gunicorn==22.0.0
 
 # HTTP requests
 requests==2.32.3
+
+# Database
+pymongo==4.8.0
