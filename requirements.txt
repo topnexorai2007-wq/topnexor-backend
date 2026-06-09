@@ -31,3 +31,10 @@ uritemplate==4.2.0
 
 # Protobuf (fixed range to avoid conflicts)
 protobuf>=4.25.0,<8.0.0
+
+# Web framework & server
+flask==3.0.3
+gunicorn==22.0.0
+
+# HTTP requests
+requests==2.32.3
